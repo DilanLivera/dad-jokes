@@ -11,10 +11,15 @@ class JokeList extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { jokes: [] };
+    this.state = { jokes: JSON.parse(window.localStorage.getItem("jokes") || "[]") };
+    this.handleClick = this.handleClick.bind(this);
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    if (this.state.jokes.length === 0) this.getJokes();
+  }
+
+  async getJokes() {
     let jokes = [];
 
     while (jokes.length < this.props.numJokesToGet) {
@@ -28,17 +33,35 @@ class JokeList extends Component {
       if (!jokeExist) jokes.push({ id: uuid(), text: response.data.joke, votes: 0 });
     }
 
-    this.setState({ jokes });
+    this.setState(
+      state => ({
+        jokes: [...state.jokes, ...jokes]
+      }),
+      /*
+        update the local storage jokes
+      */
+      () => window.localStorage.setItem("jokes", JSON.stringify(this.state.jokes))
+    );
   }
 
   handleVote(id, delta) {
-    this.setState(state => ({
-      /* 
-        go through jokes
-        find the joke with the id passed in and add the delta to that jokes votes
+    this.setState(
+      state => ({
+        /* 
+          go through jokes
+          find the joke with the id passed in and add the delta to that jokes votes
+        */
+        jokes: state.jokes.map(joke => (joke.id === id ? { ...joke, votes: joke.votes + delta } : joke))
+      }),
+      /*
+        update the local storage jokes
       */
-      jokes: state.jokes.map(joke => (joke.id === id ? { ...joke, votes: joke.votes + delta } : joke))
-    }));
+      () => window.localStorage.setItem("jokes", JSON.stringify(this.state.jokes))
+    );
+  }
+
+  handleClick() {
+    this.getJokes();
   }
 
   render() {
@@ -62,7 +85,7 @@ class JokeList extends Component {
             alt='sidebar smiley face'
             src='https://assets.dryicons.com/uploads/icon/svg/8927/0eb14c71-38f2-433a-bfc8-23d9c99b3647.svg'
           />
-          <button data-test='JokeList-getmore' className='JokeList-getmore'>
+          <button data-test='JokeList-getmore' className='JokeList-getmore' onClick={this.handleClick}>
             New Jokes
           </button>
         </div>
