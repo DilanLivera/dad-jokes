@@ -92,7 +92,9 @@ class JokeList extends Component {
       );
     }
 
-    const jokes = this.state.jokes.map(jokeObj => (
+    const SortedJokes = this.state.jokes.sort((a, b) => b.votes - a.votes);
+
+    const jokes = SortedJokes.map(jokeObj => (
       <Joke
         key={jokeObj.id}
         text={jokeObj.text}
