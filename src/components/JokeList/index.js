@@ -15,6 +15,10 @@ class JokeList extends Component {
       jokes: JSON.parse(window.localStorage.getItem("jokes") || "[]"),
       loading: false
     };
+    /*
+      create a Set to keep track of jokes to prevent duplicate jokes
+    */
+    this.seenJokes = new Set(this.state.jokes.map(joke => joke.text));
     this.handleClick = this.handleClick.bind(this);
   }
 
@@ -23,29 +27,39 @@ class JokeList extends Component {
   }
 
   async getJokes() {
-    let jokes = [];
+    try {
+      let jokes = [];
 
-    while (jokes.length < this.props.numJokesToGet) {
-      let response = await axios.get("https://icanhazdadjoke.com/", {
-        headers: {
-          Accept: "application/json"
-        }
-      });
+      while (jokes.length < this.props.numJokesToGet) {
+        let response = await axios.get("https://icanhazdadjoke.com/", {
+          headers: {
+            Accept: "application/json"
+          }
+        });
 
-      let jokeExist = jokes.some(jokeObj => jokeObj.text === response.data.joke);
-      if (!jokeExist) jokes.push({ id: uuid(), text: response.data.joke, votes: 0 });
-    }
+        let newJoke = response.data.joke;
+        /*
+          if the joke doesnt exist in the Set, add the new joke
+        */
+        if (!this.seenJokes.has(newJoke)) jokes.push({ id: uuid(), text: response.data.joke, votes: 0 });
+      }
 
-    this.setState(
-      state => ({
-        jokes: [...state.jokes, ...jokes],
-        loading: false
-      }),
+      this.setState(
+        state => ({
+          jokes: [...state.jokes, ...jokes],
+          loading: false
+        }),
+        /*
+          update the local storage jokes
+        */
+        () => window.localStorage.setItem("jokes", JSON.stringify(this.state.jokes))
+      );
+    } catch (error) {
       /*
-        update the local storage jokes
+        set loading false to load the jokes in the local storage in case if there was something wrong with getting jokes from the API 
       */
-      () => window.localStorage.setItem("jokes", JSON.stringify(this.state.jokes))
-    );
+      this.setState({ loading: false });
+    }
   }
 
   handleVote(id, delta) {
