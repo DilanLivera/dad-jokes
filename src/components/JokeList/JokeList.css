@@ -233,3 +233,46 @@
     transform: translate(10px, -9px) rotate(2.5deg);
   }
 }
+
+/*
+  for smaller screens 
+*/
+@media screen and (max-width: 600px) {
+  .JokeList {
+    width: 98%;
+    height: 98vh;
+    flex-direction: column;
+  }
+
+  .JokeList-sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .JokeList-title {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .JokeList-sidebar img {
+    width: 12%;
+    align-self: flex-end;
+  }
+
+  .JokeList-getmore {
+    font-size: 1.2rem;
+    width: 50%;
+    border-radius: 2rem;
+    padding: 1rem 2rem;
+    color: white;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
+    outline: none;
+  }
+
+  .JokeList-jokes {
+    width: 98%;
+  }
+}

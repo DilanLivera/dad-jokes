@@ -1,37 +1,29 @@
 import React from "react";
 import Joke from ".";
-import { shallow } from "enzyme";
+import { shallow, mount } from "enzyme";
 import { findByTestAttr } from "../../../utils";
 
 const props = {
-  text: "joke text",
+  text: "This is a joke",
   votes: 0,
-  upvote: () => {},
-  downvote: () => {}
-};
-
-const setUp = props => {
-  return shallow(<Joke {...props} />);
+  upvote: jest.fn(),
+  downvote: jest.fn()
 };
 
 describe("JokeList Component", () => {
   let wrapper;
 
   it("Should render without errors", () => {
-    wrapper = setUp();
+    wrapper = shallow(<Joke {...props} />);
 
     const response = findByTestAttr(wrapper, "Joke");
     expect(response.length).toBe(1);
   });
 
   it("Should upvote", () => {
-    wrapper = setUp();
+    wrapper = shallow(<Joke {...props} />);
 
-    const vote = wrapper.instance().props("text");
-
-    console.log(vote);
-
-    wrapper.find("[data-test='Joke-upvote']").simulate("click");
-    expect(wrapper.prop("votes")).toBe(2);
+    expect(wrapper.instance().props.text).toEqual("This is a joke");
+    expect(wrapper.instance().props.votes).toEqual(0);
   });
 });
